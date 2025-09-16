@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero text-white text-center d-flex flex-column justify-content-center align-items-center">
+    <h1 class="display-3 fw-bold mb-3 hero-title">Bienvenido al Sistema</h1>
+    <p class="lead mb-5 hero-subtitle">Acceda a las diferentes áreas de gestión: Clientes, Contable, Administrativo y Judicial.</p>
+
+    <!-- Botones de Acceso -->
+    <div class="d-flex justify-content-center flex-wrap gap-3">
+        <a href="{% url 'clientes:listar' %}" class="btn btn-dark-red btn-lg btn-hover-zoom">Clientes</a>
+        <a href="{% url 'contable:home' %}" class="btn btn-dark btn-lg btn-hover-zoom">Contable</a>
+        <a href="{% url 'administrativo:home' %}" class="btn btn-dark btn-lg btn-hover-zoom">Administrativo</a>
+        <a href="{% url 'juridico:home' %}" class="btn btn-dark btn-lg btn-hover-zoom">Judicial</a>
+    </div>
+</section>
+
+<style>
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, #000000, #1c1c1c);
+    padding: 120px 20px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animaciones hero */
+.hero-title {
+    animation: fadeInDown 1s ease forwards;
+    color: #ffffff;
+}
+.hero-subtitle {
+    animation: fadeInUp 1.2s ease forwards;
+    color: #ffffff;           /* blanco fuerte */
+    font-weight: 400;
+    text-shadow: 0 2px 6px rgba(255, 255, 255, 0.3), 
+                 0 2px 6px rgba(0, 0, 0, 0.8); /* resalta sobre el negro */
+}
+
+/* Botones estilo corporativo */
+.btn-dark-red {
+    background: linear-gradient(45deg, #b30000, #ff1a1a);
+    color: #fff;
+    font-weight: bold;
+    padding: 15px 30px;
+    border-radius: 15px;
+    text-decoration: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.btn-dark-red:hover {
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(255,0,0,0.5);
+}
+
+.btn-dark {
+    background: #222;
+    color: #fff;
+    font-weight: bold;
+    padding: 15px 30px;
+    border-radius: 15px;
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.btn-dark:hover {
+    background: #444;
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+}
+
+/* Efecto hover para todos los botones */
+.btn-hover-zoom:hover {
+    transform: scale(1.08);
+}
+
+/* Animaciones CSS */
+@keyframes fadeInDown {
+    0% { opacity: 0; transform: translateY(-50px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(50px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}

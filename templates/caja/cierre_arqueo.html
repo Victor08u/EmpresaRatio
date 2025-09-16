@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5 d-flex justify-content-center">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-4" style="max-width: 700px; width: 100%;">
+    <div class="card-body">
+
+      <!-- Header -->
+      <h2 class="fw-bold mb-0 text-dark">📊 Arqueo y Cierre de Caja</h2>
+      <p class="text-muted mb-4">Caja abierta el: {{ caja.fecha|date:"d/m/Y" }}</p>
+        <p class="fw-semibold mb-4">Saldo Inicial: Gs. {{ caja.saldo_inicial|floatformat:0 }}</p>   
+        <p class="text-muted mb-4">A continuación se muestra un resumen de los movimientos registrados en la caja. Verifique que los totales coincidan con su caja física antes de proceder al cierre.</p>
+        
+
+
+      <!-- Resumen de Movimientos -->
+      <div class="mb-4">
+        <div class="card shadow-sm border-0 rounded-3">
+          <div class="card-header bg-light fw-bold">
+            Resumen de Movimientos
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for item in arqueo %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>{{ item.modalidad }}</span>
+              <span>Gs. {{ item.total|floatformat:0 }}</span>
+            </li>
+            {% endfor %}
+            <li class="list-group-item d-flex justify-content-between align-items-center bg-secondary text-white">
+              <strong>Total General</strong>
+              <strong>Gs. {{ total_general|floatformat:0 }}</strong>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Formulario de cierre -->
+      <form method="post" id="cierre-form">
+        {% csrf_token %}
+        <p>Verifique los montos con su caja física. Si todo es correcto, confirme el cierre.</p>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-danger flex-fill" data-bs-toggle="modal" data-bs-target="#confirmModal">
+            Confirmar y Cerrar Caja
+          </button>
+          <a href="{% url 'caja:movimientos' %}" class="btn btn-outline-secondary flex-fill">Cancelar</a>
+        </div>
+      </form>
+
+    </div> <!-- /.card-body -->
+  </div> <!-- /.card -->
+</div> <!-- /.container -->
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="fw-bold mb-0 text-dark" id="confirmModalLabel">Confirmación de Cierre</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      
+      <!-- Body -->
+      <div class="modal-body">
+        <p class="fw-bold mb-0 text-dark">
+          ¿Está seguro de que desea cerrar la caja?<br>
+          Esta acción no se puede deshacer.
+        </p>
+      </div>
+      
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" form="cierre-form" class="btn btn-danger">Cerrar Caja</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+document.getElementById('confirmClose').addEventListener('click', function() {
+    document.getElementById('cierre-form').submit();
+});
+</script>
+
+{% endblock %}

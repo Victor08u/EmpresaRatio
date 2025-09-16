@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <h3>Eliminar Honorario</h3>
+    <p>¿Seguro que deseas eliminar el honorario <strong>{{ honorario.concepto }}</strong> del cliente <strong>{{ honorario.cliente }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'administrativo:honorarios' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

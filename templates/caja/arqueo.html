@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5 d-flex justify-content-center">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-4" style="max-width: 700px; width: 100%;">
+    <div class="card-body text-center">
+
+      <!-- Header -->
+      <h2 class="fw-bold mb-3">💰 Arqueo de Caja</h2>
+      <p class="text-muted mb-4">Resumen de la caja actual</p>
+
+      <!-- Información de la caja -->
+      <div class="row mb-4 text-start">
+        <div class="col-6 mb-2"><strong>Usuario:</strong> {{ caja.creado_por }}</div>
+        <div class="col-6 mb-2"><strong>Fecha apertura:</strong> {{ caja.creado_en|date:"d/m/Y H:i" }}</div>
+        <div class="col-6 mb-2"><strong>Saldo inicial:</strong> Gs. {{ caja.saldo_inicial|floatformat:0 }}</div>
+        <div class="col-6 mb-2"><strong>Total Ingresos:</strong> Gs. {{ ingresos|floatformat:0 }}</div>
+        <div class="col-6 mb-2"><strong>Total Egresos:</strong> Gs. {{ egresos|floatformat:0 }}</div>
+      </div>
+
+      <!-- Saldo final destacado -->
+      <div class="alert alert-success py-3 rounded-4">
+        <h4 class="mb-0"><strong>Saldo Final:</strong> Gs. {{ saldo_final|floatformat:0 }}</h4>
+      </div>
+
+      <!-- Botón volver -->
+      <a href="{% url 'caja:movimientos' %}" class="btn btn-secondary mt-3">← Volver a Movimientos</a>
+
+    </div>
+  </div>
+</div>
+
+<!-- Estilos personalizados -->
+<style>
+  .card {
+    background-color: #fff;
+  }
+
+  .alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+    font-weight: 600;
+  }
+
+  .btn-secondary {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.25s ease-in-out;
+  }
+
+  .btn-secondary:hover {
+    background-color: #e5e7eb;
+    color: #111827;
+    text-decoration: none;
+  }
+</style>
+{% endblock %}

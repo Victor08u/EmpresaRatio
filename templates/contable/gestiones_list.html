@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body">
+
+      <!-- Header: título + botón -->
+      <div class="d-flex align-items-center mb-4">
+        <div>
+          <h2 class="h3 fw-bold mb-1">📝 Gestiones Contables</h2>
+          <p class="text-muted mb-0">Gestiona y administra las gestiones registradas</p>
+        </div>
+        <div class="ms-auto text-end">
+          <a href="{% url 'contable:nueva_gestion' %}" class="btn btn-warning">
+            <i class="bi bi-plus-lg"></i> Nueva Gestión
+          </a>
+          <div class="text-muted small mt-1">Total: {{ gestiones|length }}</div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="bg-light p-3 rounded border mb-4">
+        <form method="get" class="row g-3">
+          <!-- Filtro por cliente -->
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+              <input type="text" name="cliente" value="{{ request.GET.cliente }}" class="form-control" placeholder="Filtrar por cliente">
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="col-md-6 text-end">
+            <button type="submit" class="btn btn-secondary me-2">
+              <i class="bi bi-funnel"></i> Filtrar
+            </button>
+            <a href="{% url 'contable:carga_gestiones' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle"></i> Limpiar
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Cliente</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+              <th class="text-center" style="width:150px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for g in gestiones %}
+            <tr>
+              <td class="fw-semibold">{{ g.cliente }}</td>
+              <td>{{ g.descripcion }}</td>
+              <td>{{ g.fecha|date:"d/m/Y" }}</td>
+              <td class="text-center">
+                <form method="post" action="{% url 'contable:eliminar_gestion' g.id %}" class="d-inline">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                          onclick="return confirm('¿Seguro que deseas eliminar esta gestión?');">
+                    <i class="bi bi-trash me-1"></i> Eliminar
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">
+                <i class="bi bi-inbox"></i> No hay gestiones cargadas
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div> <!-- /.card-body -->
+  </div> <!-- /.card -->
+
+</div> <!-- /.container -->
+{% endblock %}

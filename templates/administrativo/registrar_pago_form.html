@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Paso 2: Registrar Pago del Honorario</h2>
+    <p>Cliente: <strong>{{ cliente.nombre }}</strong></p>
+
+    <div class="alert alert-info">
+        <h4>Resumen del Honorario a Cobrar</h4>
+        <ul>
+            <li><strong>Concepto:</strong> {{ honorario_data.concepto }}</li>
+            <li><strong>Monto a Cobrar:</strong> Gs. {{ honorario_data.monto|floatformat:0 }}</li>
+        </ul>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-header">
+                Detalles del Pago
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label for="{{ form_pago.monto.id_for_label }}">Monto:</label>
+                    {{ form_pago.monto|add_class:"form-control" }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="{{ form_pago.modalidad.id_for_label }}">Modalidad de Pago:</label>
+                    {{ form_pago.modalidad|add_class:"form-control" }}
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <a href="{% url 'administrativo:home' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success">Confirmar y Guardar Pago</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

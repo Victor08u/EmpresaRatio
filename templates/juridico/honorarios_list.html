@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body">
+
+      <!-- Header -->
+      <div class="d-flex align-items-center mb-4">
+        <div>
+          <h2 class="h3 fw-bold mb-1">💰 Honorarios Judiciales</h2>
+          <p class="text-muted mb-0">Gestiona y administra los honorarios cargados</p>
+        </div>
+        <div class="ms-auto text-end">
+          <a href="{% url 'juridico:nuevo_honorario' %}" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Nuevo Honorario
+          </a>
+          <div class="text-muted small mt-1">Total: {{ honorarios|length }}</div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="bg-light p-3 rounded border mb-4">
+        <form method="get" class="row g-3">
+            <!-- Filtro por cliente -->
+            <div class="col-md-6">
+              <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                  <input type="text" name="cliente" value="{{ request.GET.cliente }}" 
+                      class="form-control" placeholder="Filtrar por cliente">
+              </div>
+            </div>
+
+            <!-- Filtro por modalidad -->
+            <div class="col-md-4">
+              <select name="modalidad" class="form-select">
+                  <option value="">-- Todas las modalidades --</option>
+                  {% for value,label in MODALIDAD_PAGO %}
+                  <option value="{{ value }}" {% if request.GET.modalidad == value %}selected{% endif %}>
+                      {{ label }}
+                  </option>
+                  {% endfor %}
+              </select>
+            </div>
+
+            <!-- Botones -->
+            <div class="col-md-2 text-end">
+              <button type="submit" class="btn btn-secondary me-2">
+                  <i class="bi bi-funnel"></i> Filtrar
+              </button>
+              <a href="{% url 'juridico:carga_honorarios' %}" class="btn btn-outline-secondary">
+                  <i class="bi bi-x-circle"></i> Limpiar
+              </a>
+            </div>
+        </form>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Cliente</th>
+              <th>Concepto</th>
+              <th>Monto</th>
+              <th>Modalidad</th>
+              <th>Periodo</th>
+              <th class="text-center" style="width:120px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for hono in honorarios %}
+            <tr>
+              <td class="fw-semibold">{{ hono.cliente }}</td>
+              <td>{{ hono.concepto }}</td>
+              <td>{{ hono.monto }}</td>
+              <td>{{ hono.get_modalidad_display }}</td>
+              <td>{{ hono.periodo|date:"m/Y" }}</td>
+              <td class="text-center">
+                <a href="{% url 'juridico:eliminar_honorario' hono.id %}" 
+                   class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                   onclick="return confirm('¿Está seguro de eliminar este honorario?')">
+                  <i class="bi bi-trash me-1"></i> Eliminar
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-inbox"></i> No hay honorarios cargados
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

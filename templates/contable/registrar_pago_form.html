@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Paso 2: Registrar Pago del Honorario</h2>
+    <p>Cliente: <strong>{{ cliente.nombre }}</strong></p>
+
+    <div class="alert alert-info">
+        <h4>Resumen del Honorario a Cobrar</h4>
+        <ul>
+            <li><strong>Concepto:</strong> {{ honorario_data.concepto }}</li>
+            <li><strong>Monto a Cobrar:</strong> Gs. {{ honorario_data.monto|floatformat:0 }}</li>
+        </ul>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-header">
+                Detalles del Pago
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="{{ form_pago.monto.id_for_label }}">Monto:</label>
+                        {{ form_pago.monto|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="{{ form_pago.modalidad.id_for_label }}">Modalidad de Pago:</label>
+                        {{ form_pago.modalidad|add_class:"form-select" }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="{{ form_pago.tipo_pago.id_for_label }}">Tipo de Pago:</label>
+                        {{ form_pago.tipo_pago|add_class:"form-select" }}
+                    </div>
+                    <div class="col-md-4" id="div_numero_referencia">
+                        <label for="{{ form_pago.numero_referencia.id_for_label }}">Número de Referencia:</label>
+                        {{ form_pago.numero_referencia|add_class:"form-control" }}
+                        <small class="text-muted">Solo necesario para tarjeta o transferencia</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <a href="{% url 'contable:home' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success">Confirmar y Guardar Pago</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const tipoPago = document.getElementById("id_tipo_pago");
+    const numeroRefDiv = document.getElementById("div_numero_referencia");
+
+    function toggleReferencia() {
+        if (tipoPago.value === "tarjeta" || tipoPago.value === "transferencia") {
+            numeroRefDiv.style.display = "block";
+        } else {
+            numeroRefDiv.style.display = "none";
+            document.getElementById("id_numero_referencia").value = "";
+        }
+    }
+
+    tipoPago.addEventListener("change", toggleReferencia);
+    toggleReferencia(); // ejecutar al cargar
+});
+</script>
+{% endblock %}

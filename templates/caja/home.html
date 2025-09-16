@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5 d-flex justify-content-center">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-4" style="max-width: 900px; width: 100%;">
+    <div class="card-body text-center">
+
+      <!-- Header -->
+      <h2 class="fw-bold mb-0 text-dark">Panel de Caja</h2>
+      <p class="text-muted mb-4">Seleccione la acción que desea realizar</p>
+
+      <!-- Botones en fila -->
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{% url 'caja:abrir_caja' %}" class="btn btn-option pastel-green fw-bold">
+          Abrir Caja
+        </a>
+
+        {% if ultima_caja %}
+        <a href="{% url 'caja:cerrar_caja' pk=ultima_caja.pk %}" class="btn btn-option pastel-red fw-bold">
+          Cerrar Caja
+        </a>
+
+        <a href="{% url 'caja:arqueo' %}" class="btn btn-option pastel-orange fw-bold">
+            Arqueo
+        </a>
+        {% else %}
+        <a class="btn btn-option pastel-red fw-bold disabled">Cerrar Caja</a>
+        <a class="btn btn-option pastel-orange fw-bold disabled">Arqueo</a>
+        {% endif %}
+
+        <a href="{% url 'caja:movimientos' %}" class="btn btn-option pastel-blue fw-bold">
+          Movimientos
+        </a>
+        <a href="{% url 'caja:movimientos_por_fecha' %}" class="btn btn-option pastel-purple fw-bold">
+            Movimientos por Fecha
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Estilos -->
+<style>
+  .btn-option {
+    padding: 14px 28px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: none;
+    transition: all 0.25s ease-in-out;
+  }
+
+  /* Colores pastel */
+  .pastel-green { background-color: #dcfce7; color: #166534; }
+  .pastel-red { background-color: #fee2e2; color: #991b1b; }
+  .pastel-blue { background-color: #dbeafe; color: #1e3a8a; }
+  .pastel-orange { background-color: #fff7ed; color: #9a3412; }
+  .pastel-purple { background-color: #ede9fe; color: #4c1d95; }
+  /* Hover */
+  .btn-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    filter: brightness(0.95);
+    text-decoration: none;
+  }
+
+  .card { background: #fff; }
+</style>
+{% endblock %}

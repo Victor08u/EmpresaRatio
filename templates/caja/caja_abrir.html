@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5 d-flex justify-content-center">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-4" style="max-width: 600px; width: 100%;">
+    <div class="card-body">
+
+      <!-- Header -->
+      <h2 class="fw-bold mb-3">💵 Abrir Caja</h2>
+      <p class="text-muted mb-4">Complete los datos para abrir la caja</p>
+
+      <!-- Formulario -->
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="d-flex justify-content-start mt-3">
+          <button type="submit" class="btn btn-success me-2 fw-bold">💚 Abrir</button>
+          <a href="{% url 'caja:home' %}" class="btn btn-outline-secondary fw-bold">Cancelar</a>
+        </div>
+      </form>
+
+    </div> <!-- /.card-body -->
+  </div> <!-- /.card -->
+</div> <!-- /.container -->
+{% endblock %}

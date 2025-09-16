@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body">
+
+      <!-- Header: título con ícono -->
+      <div class="d-flex align-items-center mb-4">
+        <h2 class="h3 fw-bold mb-0">➕ Nueva Gestión Contable</h2>
+      </div>
+
+      <!-- Formulario -->
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+
+        <!-- Render de campos -->
+        {{ form.as_p }}
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-start mt-3">
+          <button type="submit" class="btn btn-success me-2">
+            <i class="bi bi-save me-1"></i> Guardar
+          </button>
+          <a href="{% url 'contable:carga_gestiones' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle me-1"></i> Cancelar
+          </a>
+        </div>
+      </form>
+
+    </div> <!-- /.card-body -->
+  </div> <!-- /.card -->
+
+</div> <!-- /.container -->
+{% endblock %}

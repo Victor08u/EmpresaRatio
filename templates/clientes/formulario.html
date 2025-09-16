@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body p-4">
+
+      <!-- Header -->
+      <div class="mb-4">
+        <h2 class="h3 fw-bold mb-1">{{ accion }} Cliente</h2>
+        <p class="text-muted mb-0">Completa los datos del cliente en el sistema</p>
+      </div>
+
+      <!-- Formulario -->
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+
+        <div class="col-md-6">
+          <label for="id_nombre" class="form-label fw-semibold">Nombre</label>
+          {{ form.nombre }}
+        </div>
+
+        <div class="col-md-6">
+          <label for="id_ruc_ci" class="form-label fw-semibold">RUC/CI</label>
+          {{ form.ruc_ci }}
+        </div>
+
+        <div class="col-md-6">
+          <label for="id_email" class="form-label fw-semibold">Email</label>
+          {{ form.email }}
+        </div>
+
+        <div class="col-md-6">
+          <label for="id_telefono" class="form-label fw-semibold">Teléfono</label>
+          {{ form.telefono }}
+        </div>
+
+        <div class="col-12">
+          <label for="id_direccion" class="form-label fw-semibold">Dirección</label>
+          {{ form.direccion }}
+        </div>
+
+        <!-- Botones -->
+        <div class="col-12 d-flex justify-content-start mt-3">
+          <button type="submit" class="btn btn-primary me-2">
+            <i class="bi bi-save"></i> Guardar
+          </button>
+          <a href="{% url 'clientes:listar' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Estilos extras -->
+<style>
+  input, textarea, select {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 10px 12px;
+    width: 100%;
+    transition: 0.3s ease;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 6px rgba(13, 110, 253, 0.25);
+    outline: none;
+  }
+</style>
+{% endblock %}

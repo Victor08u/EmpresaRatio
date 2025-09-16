@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5 d-flex justify-content-center">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-4" style="max-width: 900px; width: 100%;">
+    <div class="card-body text-center">
+
+      <!-- Header -->
+      <h2 class="fw-bold mb-0 text-dark">Área Judicial</h2>
+      <p class="text-muted mb-4">Seleccione la opción que desea gestionar</p>
+
+      <!-- Botones en fila -->
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{% url 'juridico:carga_documentos' %}" class="btn btn-option pastel-blue fw-bold">
+          <i class="bi bi-folder-fill me-2"></i> Documentos
+        </a>
+
+        <a href="{% url 'juridico:carga_honorarios' %}" class="btn btn-option pastel-green fw-bold">
+          <i class="bi bi-cash-stack me-2"></i> Honorarios
+        </a>
+
+        <a href="{% url 'juridico:carga_gestiones' %}" class="btn btn-option pastel-purple fw-bold">
+          <i class="bi bi-journal-text me-2"></i> Gestiones
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Estilos -->
+<style>
+  .btn-option {
+    padding: 14px 28px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: none;
+    transition: all 0.25s ease-in-out;
+  }
+
+  /* Colores pastel */
+  .pastel-blue {
+    background-color: #dbeafe; 
+    color: #1e3a8a;
+  }
+  .pastel-green {
+    background-color: #dcfce7; 
+    color: #166534;
+  }
+  .pastel-purple {
+    background-color: #ede9fe; 
+    color: #4c1d95;
+  }
+
+  /* Hover */
+  .btn-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    filter: brightness(0.95);
+    text-decoration: none;
+  }
+
+  .card {
+    background: #fff;
+  }
+</style>
+{% endblock %}

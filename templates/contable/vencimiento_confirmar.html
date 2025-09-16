@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5 d-flex justify-content-center">
+  
+  <!-- Card principal -->
+  <div class="card shadow-lg border-0 rounded-4" style="max-width: 600px; width: 100%;">
+    <div class="card-body text-center p-5">
+      
+      <!-- Icono -->
+      <div class="mb-3">
+        <span style="font-size: 3rem;">📂</span>
+      </div>
+
+      <!-- Título -->
+      <h3 class="fw-bold mb-3 text-dark">Confirmar recepción</h3>
+      
+      <!-- Texto -->
+      <p class="text-muted fs-5">
+        ¿Desea marcar como <b class="text-success">recibido</b> el documento 
+        <b>{{ vencimiento.get_tipo_documento_display }}</b> de 
+        <b>{{ vencimiento.cliente }}</b>?
+      </p>
+
+      <!-- Botones -->
+      <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-success px-4 py-2 fw-bold rounded-3 shadow-sm">
+            ✅ Sí, recibido
+          </button>
+          <a href="{% url 'contable:lista_vencimientos' %}" 
+             class="btn btn-outline-secondary px-4 py-2 fw-bold rounded-3 shadow-sm">
+            ❌ Cancelar
+          </a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Estilos -->
+<style>
+  .card {
+    background: rgba(255, 255, 255, 0.9); /* un toque translúcido */
+  }
+  .btn-success {
+    background-color: #22c55e;
+    border: none;
+  }
+  .btn-success:hover {
+    background-color: #16a34a;
+    transform: translateY(-2px);
+  }
+  .btn-outline-secondary:hover {
+    transform: translateY(-2px);
+  }
+</style>
+{% endblock %}
