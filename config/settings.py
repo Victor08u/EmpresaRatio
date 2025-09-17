@@ -118,9 +118,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # --- LOGIN/LOGOUT ---
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
+# A dónde redirige si no está logueado
+LOGIN_URL = 'login'
+
+# A dónde redirige después de iniciar sesión
+LOGIN_REDIRECT_URL = 'index'  
+
+# A dónde va después de cerrar sesión (opcional)
+LOGOUT_REDIRECT_URL = 'login'
 
 # --- EMAIL (para desarrollo, usa consola) ---
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -130,7 +135,11 @@ LOGOUT_REDIRECT_URL = '/login/'
 #EMAIL_HOST_USER = 'vmorinigo31@gmail.com'
 #EMAIL_HOST_PASSWORD = 'nxoludpbghkaimak'  # tu App Password sin espacios
 #DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# Tiempo de sesión en segundos (ej: 30 días)
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 días
 
+# Para que la sesión no se borre al cerrar el navegador
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 # Lista de destinatarios internos (los que deben recibir las alertas)
 VENCIMIENTOS_RECIPIENTES = [
     "victor.morinigo06@unae.edu.py",
