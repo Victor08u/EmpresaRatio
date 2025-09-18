@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from contable.tasks import enviar_vencimientos_email
 
+
 class Command(BaseCommand):
     help = 'Enviar correos de vencimientos'
 
