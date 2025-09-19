@@ -8,12 +8,12 @@
     <div class="card-body text-center">
 
       <!-- Header -->
-      <h2 class="fw-bold mb-3">💰 Arqueo de Caja</h2>
+      <h2 class="fw-bold mb-0 text-dark">Arqueo de Caja</h2>
       <p class="text-muted mb-4">Resumen de la caja actual</p>
 
       <!-- Información de la caja -->
       <div class="row mb-4 text-start">
-        <div class="col-6 mb-2"><strong>Usuario:</strong> {{ caja.creado_por }}</div>
+        <div class="col-6 mb-2"><strong>Usuario:</strong> {{ caja.usuario.username }}</div>
         <div class="col-6 mb-2"><strong>Fecha apertura:</strong> {{ caja.creado_en|date:"d/m/Y H:i" }}</div>
         <div class="col-6 mb-2"><strong>Saldo inicial:</strong> Gs. {{ caja.saldo_inicial|floatformat:0 }}</div>
         <div class="col-6 mb-2"><strong>Total Ingresos:</strong> Gs. {{ ingresos|floatformat:0 }}</div>

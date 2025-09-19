@@ -11,6 +11,11 @@ from django.dispatch import receiver
 
 
 class Caja(TimeStampedUserModel):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="cajas"
+    )
     fecha = models.DateField(auto_now_add=True)
     abierta = models.BooleanField(default=True)
     saldo_inicial = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -18,7 +23,7 @@ class Caja(TimeStampedUserModel):
 
     def __str__(self):
         estado = "Abierta" if self.abierta else "Cerrada"
-        return f"Caja {self.fecha} ({estado})"
+        return f"Caja de {self.usuario.username} - {self.fecha} ({estado})"
     
     def calcular_saldo(self):
         ingresos = self.movimientocaja_set.filter(tipo="ING").aggregate(total=Sum("monto"))["total"] or 0

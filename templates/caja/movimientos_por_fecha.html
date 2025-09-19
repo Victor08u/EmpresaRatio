@@ -37,6 +37,7 @@
               <th>Tipo</th>
               <th>Monto</th>
               <th>Detalle</th>
+              <th class="text-center">Recibo</th>
             </tr>
           </thead>
           <tbody>
@@ -46,6 +47,16 @@
               <td>{{ m.get_tipo_display }}</td>
               <td>{{ m.monto }}</td>
               <td>{{ m.detalle }}</td>
+              <td class="text-center">
+                {% if m.tipo == "ING" %}
+                  <a href="{% url 'caja:recibo_movimiento' m.id %}" 
+                     class="btn btn-sm btn-primary" target="_blank">
+                    Imprimir
+                  </a>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
             </tr>
             {% endfor %}
           </tbody>

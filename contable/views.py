@@ -21,6 +21,9 @@ from django.db.models import Q
 from core.models import TimeStampedUserModel
 from core.utils import registrar_auditoria
 from django.forms.models import model_to_dict
+from django.core.paginator import Paginator
+from django.contrib.auth import get_user_model
+
 
 
 
@@ -46,6 +49,10 @@ def contable_home(request):
 @rol_requerido(*ROLES_CONTABLE)
 def carga_documentos(request):
     documentos = DocConta.objects.all().order_by("-creado_en")
+    # Paginación (10 por página, podés cambiarlo)
+    paginator = Paginator(documentos, 10)
+    page_number = request.GET.get("page")
+    documentos = paginator.get_page(page_number)
 
     # --- Filtro por cliente ---
     cliente_nombre = request.GET.get("cliente")
@@ -221,7 +228,11 @@ def registrar_pago_honorario(request):
             )
 
             # Caja abierta
-            caja_abierta = Caja.objects.get(creado_por=request.user, abierta=True)
+            try:
+                caja_abierta = Caja.objects.get(usuario=request.user, abierta=True)
+            except Caja.DoesNotExist:
+                messages.error(request, "No tienes ninguna caja abierta. Abre una caja antes de registrar pagos.")
+                return redirect("caja:abrir_caja")  # o la URL que corresponda
 
             # Movimiento de caja
             movimiento = form_pago.save(commit=False)

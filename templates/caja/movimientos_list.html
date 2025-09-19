@@ -70,9 +70,11 @@
               <td>{{ mov.get_tipo_pago_display }}</td>
               <td>Gs. {{ mov.monto }}</td>
               <td class="text-center">
-                <a href="{% url 'caja:recibo_movimiento' mov.id %}" class="btn btn-sm btn-primary" target="_blank">
-                  Imprimir
-                </a>
+                {% if mov.tipo == "ING" %}
+                    <a href="{% url 'caja:recibo_movimiento' mov.id %}" class="btn btn-sm btn-primary" target="_blank">
+                    Imprimir
+                    </a>
+                {% endif %}
               </td>
             </tr>
             {% empty %}

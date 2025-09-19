@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Caja, MovimientoCaja
-from .forms import CajaAperturaForm, CajaCierreForm, MovimientoCajaForm
+from .forms import CajaAperturaForm, CajaCierreForm, MovimientoCajaForm, MovimientoManualForm
 from django.db.models import Sum
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
@@ -19,30 +19,38 @@ from django.core.exceptions import ObjectDoesNotExist
 from core.utils import registrar_auditoria
 from django.utils.timezone import make_aware
 from datetime import datetime
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib.units import mm
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import Paragraph
+
+
+
 
 logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo_empresa.png')
 
 @login_required
 
 def caja_home(request):
-    ultima_caja = Caja.objects.filter(creado_por=request.user).last()
+    ultima_caja = Caja.objects.filter(usuario=request.user).last()
     return render(request, "caja/home.html", {"ultima_caja": ultima_caja})
 
 
 
 @login_required
 def abrir_caja(request):
-    if Caja.objects.filter(creado_por=request.user, abierta=True).exists():
+    if Caja.objects.filter(usuario=request.user, abierta=True).exists():
         messages.warning(request, "Ya tienes una caja abierta.")
         return redirect("caja:movimientos")
 
     if request.method == "POST":
         form = CajaAperturaForm(request.POST)
-
         if form.is_valid():
             caja = form.save(commit=False)
-            caja.creado_por = request.user
-            caja.abierta = True
+            caja.usuario = request.user  # 🔑 asignar dueño de la caja
             caja.save()
             registrar_auditoria(request.user, caja, 'APERTURA', None)
             messages.success(request, "Caja abierta correctamente.")
@@ -59,7 +67,7 @@ def cerrar_caja(request, pk):
     datos_viejos = None
     try:
         # Buscamos la caja por su ID (pk) y nos aseguramos de que esté abierta
-        caja_abierta = Caja.objects.get(pk=pk, abierta=True)
+        caja_abierta = get_object_or_404(Caja, pk=pk, usuario=request.user, abierta=True)
     except Caja.DoesNotExist:
         messages.error(request, "La caja especificada no existe o ya está cerrada.")
         return redirect("caja:movimientos")
@@ -96,18 +104,18 @@ def cerrar_caja(request, pk):
 
 def arqueo(request):
     # Tomamos la última caja abierta
-    caja = Caja.objects.filter(abierta=True).last()
-    if not caja:
+    caja_abierta = Caja.objects.filter(usuario=request.user, abierta=True).last()
+    if not caja_abierta:
         messages.warning(request, "No hay ninguna caja abierta.")
         return redirect("caja:movimientos")  # redirige a la lista de movimientos
 
     # Calculamos ingresos, egresos y saldo final
-    ingresos = MovimientoCaja.objects.filter(caja_movimiento=caja, tipo="ING").aggregate(total=Sum("monto"))["total"] or 0
-    egresos = MovimientoCaja.objects.filter(caja_movimiento=caja, tipo="EGR").aggregate(total=Sum("monto"))["total"] or 0
-    saldo_final = caja.saldo_inicial + ingresos - egresos
+    ingresos = MovimientoCaja.objects.filter(caja_movimiento=caja_abierta, tipo="ING").aggregate(total=Sum("monto"))["total"] or 0
+    egresos = MovimientoCaja.objects.filter(caja_movimiento=caja_abierta, tipo="EGR").aggregate(total=Sum("monto"))["total"] or 0
+    saldo_final = caja_abierta.saldo_inicial + ingresos - egresos
 
     return render(request, "caja/arqueo.html", {
-        "caja": caja,
+        "caja": caja_abierta,
         "ingresos": ingresos,
         "egresos": egresos,
         "saldo_final": saldo_final
@@ -117,7 +125,11 @@ def arqueo(request):
 from django.utils.dateparse import parse_date
 
 def movimientos(request):
-    caja = Caja.objects.filter(abierta=True).last()
+    caja_abierta = Caja.objects.filter(usuario=request.user, abierta=True).last()
+    if not caja_abierta:
+        messages.warning(request, "No hay ninguna caja abierta.")
+        return redirect("caja:home")  # redirige a la lista de movimientos
+    caja = caja_abierta
     movimientos = MovimientoCaja.objects.filter(caja_movimiento=caja) if caja else MovimientoCaja.objects.none()
 
     # Filtros por fecha
@@ -136,6 +148,7 @@ def movimientos(request):
     )
 
 def recibo_movimiento(request, pk):
+
     mov = get_object_or_404(MovimientoCaja, pk=pk)
 
     response = HttpResponse(content_type="application/pdf")
@@ -144,47 +157,62 @@ def recibo_movimiento(request, pk):
     p = canvas.Canvas(response, pagesize=A4)
     width, height = A4
 
-    # --- Logo de la empresa ---
-    logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo_empresa2.png')
+    # --- Dibujar borde redondeado ---
+    p.setStrokeColor(colors.black)
+    p.setLineWidth(1)
+    p.roundRect(40, height - 270, width - 80, 220, 10, stroke=1, fill=0)
+
+    # --- Logo ---
+    logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo_empresa.png')
     if os.path.exists(logo_path):
-        p.drawImage(logo_path, 40, height - 100, width=100, height=50, preserveAspectRatio=True)
-    else:
-        print("Logo NO encontrado:", logo_path)
+        # ancho y alto proporcionales (máximo 100px de alto)
+        p.drawImage(
+            logo_path,
+            55, height - 95,   # posición
+            width=130, height=50,  # espacio asignado
+            preserveAspectRatio=True,
+            mask='auto'
+        )
 
     # --- Encabezado ---
-    p.setFont("Helvetica-Bold", 18)
-    p.drawCentredString(width / 2, height - 50, "RECIBO DE CAJA")
+    p.setFont("Helvetica-Bold", 12)
+    p.drawCentredString(width/2, height - 65, "RECIBO")
 
-    # Línea decorativa
-    p.setLineWidth(1)
-    p.line(40, height - 60, width - 40, height - 60)
+    # --- Número y monto ---
+    p.setFont("Helvetica-Bold", 10)
+    p.drawRightString(width - 60, height - 60, f"N.º {mov.id}")
+    p.setFont("Helvetica-Bold", 12)
+    p.drawRightString(width - 60, height - 80, f"G. {mov.monto:,.0f}")
 
-    # --- Datos del recibo ---
-    p.setFont("Helvetica", 12)
-    y = height - 130
-    line_height = 25
+    # --- Fecha ---
+    p.setFont("Helvetica", 10)
+    p.drawRightString(width - 60, height - 105, mov.fecha.strftime("Obligado, %d de %B del %Y"))
 
-    datos = [
-        f"Cliente: {mov.cliente if mov.cliente else '---'}",
-        f"Concepto: {mov.concepto}",
-        f"Monto: Gs. {mov.monto:,.2f}",
-        f"Forma de Pago: {mov.get_modalidad_display()}",
-        f"Fecha: {mov.fecha.strftime('%d/%m/%Y %H:%M')}",
-        f"Usuario: {mov.usuario_alta.username if mov.usuario_alta else '---'}"
-    ]
+    # --- Campos ---
+    p.setFont("Helvetica", 10)
+    p.drawString(60, height - 135, "Recibí (mos) de")
+    p.line(140, height - 137, width - 60, height - 137)
+    p.drawString(145, height - 135, mov.cliente.nombre if mov.cliente else "---")
 
-    for d in datos:
-        p.drawString(50, y, d)
-        y -= line_height
+    p.drawString(60, height - 160, "La cantidad de guaraníes")
+    p.line(200, height - 162, width - 60, height - 162)
+    p.drawString(205, height - 160, f"{mov.monto:,.0f}")
 
-    # --- Pie de página ---
-    p.setFont("Helvetica-Oblique", 10)
-    p.drawCentredString(width / 2, 30, "Gracias por su pago. ¡Mantenga este recibo como comprobante!")
+    p.drawString(60, height - 185, "En concepto de pago")
+    p.line(170, height - 187, width - 60, height - 187)
+    p.drawString(175, height - 185, mov.concepto)
+
+    # --- Firma ---
+    p.line(width/2 - 100, height - 230, width/2 + 100, height - 230)
+    p.setFont("Helvetica", 9)
+    p.drawCentredString(width/2, height - 245, "Firma y aclaración")
+    p.setFont("Helvetica-Bold", 10)
+    p.drawCentredString(width/2, height - 260, "Ratio Asesoría Empresarial")
 
     p.showPage()
     p.save()
-
     return response
+
 
 @login_required
 def movimientos_por_fecha(request):
@@ -202,3 +230,28 @@ def movimientos_por_fecha(request):
         "fecha_desde": fecha_desde,
         "fecha_hasta": fecha_hasta,
     })
+
+@login_required
+@transaction.atomic
+def nuevo_movimiento(request):
+    caja_abierta = Caja.objects.filter(abierta=True, usuario=request.user).first()
+    if not caja_abierta:
+        messages.error(request, "No tienes ninguna caja abierta. Primero debes abrirla.")
+        return redirect('caja:home')
+
+    if request.method == "POST":
+        form = MovimientoManualForm(request.POST)
+        if form.is_valid():
+            movimiento = form.save(commit=False)
+            movimiento.caja_movimiento = caja_abierta  # <--- CORRECCIÓN
+            movimiento.usuario_alta = request.user
+            movimiento.save()
+            registrar_auditoria(request.user, movimiento, 'CREACION', None)
+            messages.success(request, "Movimiento registrado.")
+            return redirect('caja:movimientos')
+        else:
+            messages.error(request, "Corrige los errores del formulario.")
+    else:
+        form = MovimientoManualForm()
+
+    return render(request, 'caja/nuevo_movimiento.html', {'form': form})
